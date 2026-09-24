@@ -38,9 +38,9 @@ body{font-family:var(--f-text);font-size:14px;line-height:1.4;padding:16px 16px 
 .note-top{margin:10px 0 12px;font-size:12.5px;color:var(--muted);max-width:78ch}
 
 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-bottom:1px solid var(--rule)}
-table{border-collapse:separate;border-spacing:0;width:100%;min-width:1240px;table-layout:fixed}
-col.c1{width:172px} col.c2{width:158px} col.c3{width:178px} col.c4{width:auto}
-col.c5{width:118px}  col.c6{width:106px} col.c7{width:86px}  col.c8{width:104px} col.c9{width:104px}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:1370px;table-layout:fixed}
+col.c1{width:172px} col.c2{width:158px} col.c3{width:118px} col.c4{width:118px} col.c5{width:178px}
+col.c6{width:auto}  col.c7{width:106px} col.c8{width:86px}  col.c9{width:104px} col.c10{width:104px}
 
 thead th{padding:0 6px 8px;text-align:left;vertical-align:bottom;font-weight:600;font-size:12px;line-height:1.25;color:var(--ink);background:var(--bg)}
 thead th.r{text-align:right;padding-right:16px}
@@ -119,7 +119,7 @@ tr.tot td.red{color:var(--red)}
 
 <div class="scroll" role="region" aria-label="Tabella scorrevole" tabindex="0">
 <table id="tab">
-  <colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"><col class="c5"><col class="c6"><col class="c7"><col class="c8"><col class="c9"></colgroup>
+  <colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"><col class="c5"><col class="c6"><col class="c7"><col class="c8"><col class="c9"><col class="c10"></colgroup>
   <thead><tr id="hdr"></tr></thead>
   <tbody id="body"></tbody>
 </table>
@@ -136,9 +136,10 @@ const DATA = {"total": {"label": "TOTALE", "order": -1, "total": true, "n": 4283
 const COLS = [
   {k:'order',  t:'Classi di reddito complessivo in euro', align:'l'},
   {k:'n',      t:'Numero dei contribuenti',               align:'l'},
+  {k:'cont',   t:'Contribuenti con Irpef a carico',       align:'r'},
+  {k:'nonpag', t:'Contribuenti che non pagano Irpef',     align:'r'},
   {k:'inc',    t:'Reddito complessivo - Ammontare',       align:'l'},
   {k:'med',    t:'Reddito medio',                         align:'l'},
-  {k:'cont',   t:'Contribuenti con Irpef a carico',       align:'r'},
   {k:'imp',    t:'Imposta netta - Ammontare',             align:'l'},
   {k:'impmed', t:'Imposta netta - Media',                 align:'l'},
   {k:'incPct', t:'Incidenza percentuale contribuenti',    align:'l'},
@@ -146,6 +147,8 @@ const COLS = [
 ];
 
 const T = DATA.total;
+// contribuenti che non pagano Irpef = numero dei contribuenti - contribuenti con Irpef a carico
+[T, ...DATA.rows].forEach(r => { r.nonpag = r.n - r.cont; });
 const MAXMED = Math.max(...DATA.rows.map(r => Math.abs(r.med)));
 const MAXIMP = Math.max(...DATA.rows.map(r => Math.abs(r.impmed)));
 
@@ -173,9 +176,10 @@ function rowHTML(r, isTot){
   const cells = [];
   cells.push(`<td class="lab">${r.label}</td>`);
   cells.push(`<td>${barCell('blue', isTot?100:pctW(r.n,T.n), fmtInt(r.n))}</td>`);
+  cells.push(`<td class="r">${fmtInt(r.cont)}</td>`);
+  cells.push(`<td class="r">${fmtInt(r.nonpag)}</td>`);
   cells.push(`<td>${barCell('green'+neg(r.inc), isTot?100:pctW(r.inc,T.inc), fmtInt(r.inc))}</td>`);
   cells.push(`<td class="${isTot?'red':''}">${tickCell(r.med, MAXMED)}</td>`);
-  cells.push(`<td class="r">${fmtInt(r.cont)}</td>`);
   cells.push(`<td>${barCell('green', isTot?100:pctW(r.imp,T.imp), fmtInt(r.imp))}</td>`);
   cells.push(`<td class="${isTot?'red':''}">${tickCell(r.impmed, MAXIMP)}</td>`);
   cells.push(`<td>${barCell('orange pct', isTot?100:pctW(r.incPct,100), fmtPct(r.incPct))}</td>`);
@@ -214,8 +218,8 @@ document.getElementById('hdr').addEventListener('click', e => {
 });
 
 document.getElementById('dl').addEventListener('click', () => {
-  const head = ['Classi di reddito complessivo in euro','Numero dei contribuenti','Reddito complessivo - Ammontare (migliaia di euro)','Reddito medio (euro)','Contribuenti con Irpef a carico','Imposta netta - Ammontare (migliaia di euro)','Imposta netta - Media (euro)','Incidenza percentuale contribuenti','Irpef pagata in percentuale'];
-  const line = r => [r.label, r.n, r.inc, r.med, r.cont, r.imp, r.impmed, r.incPct.toFixed(2).replace('.',','), r.irpefPct.toFixed(2).replace('.',',')].map(x => `"${String(x).replace(/"/g,'""')}"`).join(';');
+  const head = ['Classi di reddito complessivo in euro','Numero dei contribuenti','Contribuenti con Irpef a carico','Contribuenti che non pagano Irpef','Reddito complessivo - Ammontare (migliaia di euro)','Reddito medio (euro)','Imposta netta - Ammontare (migliaia di euro)','Imposta netta - Media (euro)','Incidenza percentuale contribuenti','Irpef pagata in percentuale'];
+  const line = r => [r.label, r.n, r.cont, r.nonpag, r.inc, r.med, r.imp, r.impmed, r.incPct.toFixed(2).replace('.',','), r.irpefPct.toFixed(2).replace('.',',')].map(x => `"${String(x).replace(/"/g,'""')}"`).join(';');
   const csv = '\ufeff' + [head.map(h => `"${h}"`).join(';'), line(T), ...DATA.rows.map(line)].join('\r\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
