@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Chi paga l'Irpef in Italia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#ffffff;
+  --ink:#1d1d1d;
+  --muted:#5f5f5f;
+  --rule:#d9d9d9;
+  --track:#e7e7e7;
+  --stripe:#f6f6f6;
+  --green:#4f9c3c;
+  --green-dk:#3f7f30;
+  --blue:#3b78b5;
+  --orange:#f08a3c;
+  --red:#c62d2d;
+  --link:#2a6ebb;
+  --f-display:'Fraunces', Georgia, 'Times New Roman', serif;
+  --f-text:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --f-mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-text);font-size:14px;line-height:1.4;padding:16px 16px 20px;-webkit-text-size-adjust:100%}
+
+.head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:6px}
+.head h1{font-family:var(--f-display);font-weight:700;font-size:clamp(24px,3.2vw,34px);line-height:1.1;margin:0 0 6px;letter-spacing:-.01em}
+.head .sub{margin:0;font-size:14px;color:var(--muted)}
+.logo{flex:0 0 auto;width:150px;height:auto;display:block}
+.note-top{margin:10px 0 12px;font-size:12.5px;color:var(--muted);max-width:78ch}
+
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-bottom:1px solid var(--rule)}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:1240px;table-layout:fixed}
+col.c1{width:172px} col.c2{width:158px} col.c3{width:178px} col.c4{width:auto}
+col.c5{width:118px}  col.c6{width:106px} col.c7{width:86px}  col.c8{width:104px} col.c9{width:104px}
+
+thead th{padding:0 6px 8px;text-align:left;vertical-align:bottom;font-weight:600;font-size:12px;line-height:1.25;color:var(--ink);background:var(--bg)}
+thead th.r{text-align:right;padding-right:16px}
+thead th:first-child{padding-left:6px}
+.sortbtn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:flex-end;gap:4px;font:inherit;font-weight:600;text-align:inherit}
+th.r .sortbtn{flex-direction:row-reverse;text-align:right}
+.sortbtn:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:2px}
+.sortbtn .arr{flex:0 0 auto;width:8px;font-size:9px;line-height:1.4;color:#9a9a9a;opacity:0}
+th[aria-sort] .arr{opacity:1;color:var(--ink)}
+.sortbtn:hover .arr{opacity:1}
+
+tbody td{height:28px;padding:2px 6px;vertical-align:middle;border-top:1px solid #ececec;font-family:var(--f-mono);font-size:11.5px}
+tbody tr.dat:nth-child(even) td{background:var(--stripe)}
+tbody tr.dat:nth-child(even) td.lab{background:var(--green)}
+td.lab{position:sticky;left:0;z-index:2;background:var(--green);color:#fff;font-family:var(--f-text);font-weight:700;font-size:12.5px;padding-left:8px;border-top-color:#5aa648;white-space:nowrap}
+td.r{text-align:right;padding-right:16px}
+
+/* barre */
+.bar{display:flex;align-items:center;height:18px;background:var(--track);position:relative}
+.bar i{display:block;height:100%;flex:0 0 auto;min-width:1px}
+.bar b{font-weight:400;padding-left:5px;white-space:nowrap;color:#3a3a3a}
+.bar.blue i{background:var(--blue)} .bar.green i{background:var(--green)} .bar.orange i{background:var(--orange)}
+.bar.neg i{background:var(--red)}
+.bar.pct b{font-weight:600;color:var(--ink)}
+.bar.pct.orange b{font-family:var(--f-text);font-weight:700}
+
+.tick{display:block;position:relative}
+.tick span{display:block;line-height:1.15;font-size:12px}
+.tick i{display:block;height:4px;margin-top:2px;background:var(--green)}
+.tick.neg i{background:var(--red)}
+
+/* riga totale */
+tr.tot td{height:34px;border-top:3px solid #2b2b2b;border-bottom:3px solid #2b2b2b;background:#fff!important;font-weight:600}
+tr.tot td.lab{background:var(--green)!important;font-size:13.5px}
+tr.tot .bar{height:22px}
+tr.tot .bar i{display:none}
+tr.tot .bar{justify-content:flex-end;color:#fff}
+tr.tot .bar b{color:#fff;font-weight:600;padding:0 6px}
+tr.tot .bar.blue{background:var(--blue)} tr.tot .bar.green{background:var(--green)} tr.tot .bar.orange{background:var(--orange)}
+tr.tot .tick span{color:var(--red);font-weight:600;font-size:13px}
+tr.tot td.red{color:var(--red)}
+
+.foot{margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--f-text)}
+.foot a{color:var(--link);text-decoration:none}
+.foot a:hover{text-decoration:underline}
+.foot button.dl{all:unset;cursor:pointer;color:var(--link)}
+.foot button.dl:hover{text-decoration:underline}
+.foot button.dl:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.foot .sep{margin:0 6px}
+.foot p{margin:0 0 6px}
+.foot .avviso{margin-top:8px;padding:8px 10px;border-left:3px solid var(--orange);background:#fbf5ee;color:#4a4a4a;max-width:110ch}
+
+@media (max-width:640px){
+  body{padding:12px 10px 16px}
+  .logo{width:104px}
+  .head{gap:12px}
+  col.c1{width:140px}
+  td.lab{font-size:11px;padding-left:6px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .bar i,.tick i{transition:width .25s ease}
+}
+</style>
+</head>
+<body>
+
+<header class="head">
+  <div>
+    <h1>Chi paga l'Irpef in Italia</h1>
+    <p class="sub">Dichiarazioni 2025, redditi 2024: contribuenti, reddito e imposta netta per classe di reddito complessivo</p>
+  </div>
+  <img class="logo" alt="il Fatto Quotidiano.it" src="data:image/png;base64,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">
+</header>
+
+<p class="note-top">*Ammontare espresso in migliaia di Euro.<br>La tabella può essere ordinata in modo ascendente/discendente cliccando sulla colonna prescelta</p>
+
+<div class="scroll" role="region" aria-label="Tabella scorrevole" tabindex="0">
+<table id="tab">
+  <colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"><col class="c5"><col class="c6"><col class="c7"><col class="c8"><col class="c9"></colgroup>
+  <thead><tr id="hdr"></tr></thead>
+  <tbody id="body"></tbody>
+</table>
+</div>
+
+<div class="foot">
+  <p>Tabella: Elaborazione dati Fabio Amato<span class="sep">•</span>Fonte: <a href="https://www1.finanze.gov.it/finanze/analisi_stat/public/v_4_0_0/contenuti/cla_anno_calcolo_irpef_2025.csv?d=1615465800" target="_blank" rel="noopener">DATI MEF</a> (Dipartimento delle Finanze, dichiarazioni Irpef 2025, anno d'imposta 2024)<span class="sep">•</span><button class="dl" id="dl" type="button">Scaricare i dati</button></p>
+  <p>Totali nazionali ottenuti sommando i dati per classi di età. Redditi medi e imposte medie arrotondati alle decine di euro.</p>
+</div>
+
+<script>
+const DATA = {"total": {"label": "TOTALE", "order": -1, "total": true, "n": 42837006, "inc": 1076240862, "med": 25810, "cont": 34104260, "imp": 197371399, "impmed": 5790, "incPct": 100.0, "irpefPct": 100.0}, "rows": [{"label": "<-1.000", "order": 0, "total": false, "n": 1779, "inc": -19471, "med": -10950, "cont": 0, "imp": 0, "impmed": 0, "incPct": 0.004152951305700496, "irpefPct": 0.0}, {"label": "-1.000 <> 0", "order": 1, "total": false, "n": 615, "inc": -259, "med": -420, "cont": 0, "imp": 0, "impmed": 0, "incPct": 0.0014356745660516052, "irpefPct": 0.0}, {"label": "0", "order": 2, "total": false, "n": 1146178, "inc": 0, "med": 0, "cont": 4, "imp": 0, "impmed": 10, "incPct": 2.675672524825848, "irpefPct": 2.0266360908695735e-08}, {"label": "da 0 a 1.000", "order": 3, "total": false, "n": 2211066, "inc": 942906, "med": 430, "cont": 587689, "imp": 34245, "impmed": 60, "incPct": 5.161579219612127, "irpefPct": 0.017350739883248176}, {"label": "da 1.000 a 1.500", "order": 4, "total": false, "n": 537603, "inc": 668644, "med": 1240, "cont": 173503, "imp": 26279, "impmed": 150, "incPct": 1.254996672736652, "irpefPct": 0.013314744774183693}, {"label": "da 1.500 a 2.000", "order": 5, "total": false, "n": 447397, "inc": 784938, "med": 1750, "cont": 141870, "imp": 30086, "impmed": 210, "incPct": 1.0444170631346177, "irpefPct": 0.015243314984570225}, {"label": "da 2.000 a 2.500", "order": 6, "total": false, "n": 399285, "inc": 900116, "med": 2250, "cont": 123216, "imp": 32813, "impmed": 270, "incPct": 0.932102957895797, "irpefPct": 0.016624845954787807}, {"label": "da 2.500 a 3.000", "order": 7, "total": false, "n": 372576, "inc": 1025516, "med": 2750, "cont": 106402, "imp": 34260, "impmed": 320, "incPct": 0.8697526619857607, "irpefPct": 0.017358384354582937}, {"label": "da 3.000 a 3.500", "order": 8, "total": false, "n": 335661, "inc": 1090511, "med": 3250, "cont": 94078, "imp": 33617, "impmed": 360, "incPct": 0.7835771715698338, "irpefPct": 0.017032481511469223}, {"label": "da 3.500 a 4.000", "order": 9, "total": false, "n": 330827, "inc": 1240755, "med": 3750, "cont": 90674, "imp": 36857, "impmed": 410, "incPct": 0.7722925360376492, "irpefPct": 0.018673748189728744}, {"label": "da 4.000 a 5.000", "order": 10, "total": false, "n": 635631, "inc": 2868046, "med": 4510, "cont": 162921, "imp": 79187, "impmed": 490, "incPct": 1.4838361952747119, "irpefPct": 0.04012059118186051}, {"label": "da 5.000 a 6.000", "order": 11, "total": false, "n": 610223, "inc": 3360629, "med": 5510, "cont": 150622, "imp": 84591, "impmed": 560, "incPct": 1.4245229930401766, "irpefPct": 0.042858930188623155}, {"label": "da 6.000 a 7.500", "order": 12, "total": false, "n": 939866, "inc": 6358695, "med": 6770, "cont": 390366, "imp": 167434, "impmed": 430, "incPct": 2.1940515637344027, "irpefPct": 0.08483182166488543}, {"label": "da 7.500 a 10.000", "order": 13, "total": false, "n": 2830999, "inc": 24358317, "med": 8600, "cont": 1231107, "imp": 553358, "impmed": 450, "incPct": 6.608769529784599, "irpefPct": 0.28036384933246156}, {"label": "da 10.000 a 12.000", "order": 14, "total": false, "n": 1762064, "inc": 19399603, "med": 11010, "cont": 1467940, "imp": 1005682, "impmed": 690, "incPct": 4.113415396024643, "irpefPct": 0.5095380209087018}, {"label": "da 12.000 a 15.000", "order": 15, "total": false, "n": 2833176, "inc": 38229256, "med": 13490, "cont": 2612019, "imp": 2946317, "impmed": 1130, "incPct": 6.613851584305401, "irpefPct": 1.4927783441518356}, {"label": "da 15.000 a 20.000", "order": 16, "total": false, "n": 4793797, "inc": 84056500, "med": 17530, "cont": 4426804, "imp": 7089664, "impmed": 1600, "incPct": 11.190784435308107, "irpefPct": 3.5920420142513287}, {"label": "da 20.000 a 26.000", "order": 17, "total": false, "n": 6650736, "inc": 153416662, "med": 23070, "cont": 6507713, "imp": 18775272, "impmed": 2890, "incPct": 15.525678895485834, "irpefPct": 9.512661060051771}, {"label": "da 26.000 a 29.000", "order": 18, "total": false, "n": 3053842, "inc": 83828281, "med": 27450, "cont": 3006430, "imp": 11749355, "impmed": 3910, "incPct": 7.128980956325473, "irpefPct": 5.95291678367212}, {"label": "da 29.000 a 35.000", "order": 19, "total": false, "n": 4899564, "inc": 155815804, "med": 31800, "cont": 4848590, "imp": 26167523, "impmed": 5400, "incPct": 11.437690113076531, "irpefPct": 13.25801178160596}, {"label": "da 35.000 a 40.000", "order": 20, "total": false, "n": 2477448, "inc": 92518903, "med": 37340, "cont": 2458466, "imp": 18158503, "impmed": 7390, "incPct": 5.783429402138889, "irpefPct": 9.200169140287866}, {"label": "da 40.000 a 50.000", "order": 21, "total": false, "n": 2287385, "inc": 101224536, "med": 44250, "cont": 2269785, "imp": 21927014, "impmed": 9660, "incPct": 5.339740597183659, "irpefPct": 11.109519601388836}, {"label": "da 50.000 a 55.000", "order": 22, "total": false, "n": 602928, "inc": 31565112, "med": 52350, "cont": 598312, "imp": 7429399, "impmed": 12420, "incPct": 1.407493324813597, "irpefPct": 3.7641718472271055}, {"label": "da 55.000 a 60.000", "order": 23, "total": false, "n": 431530, "inc": 24762566, "med": 57380, "cont": 427852, "imp": 6026546, "impmed": 14090, "incPct": 1.0073766593304863, "irpefPct": 3.0534041195182056}, {"label": "da 60.000 a 70.000", "order": 24, "total": false, "n": 593331, "inc": 38336950, "med": 64610, "cont": 588386, "imp": 9771100, "impmed": 16610, "incPct": 1.3850897982926258, "irpefPct": 4.950616090872202}, {"label": "da 70.000 a 75.000", "order": 25, "total": false, "n": 218686, "inc": 15839265, "med": 72430, "cont": 216887, "imp": 4215682, "impmed": 19440, "incPct": 0.5105072002464411, "irpefPct": 2.135913512711099}, {"label": "da 75.000 a 80.000", "order": 26, "total": false, "n": 185424, "inc": 14355189, "med": 77420, "cont": 183921, "imp": 3908855, "impmed": 21250, "incPct": 0.43285938330984197, "irpefPct": 1.9804565179527196}, {"label": "da 80.000 a 90.000", "order": 27, "total": false, "n": 290196, "inc": 24587085, "med": 84730, "cont": 288101, "imp": 6877204, "impmed": 23870, "incPct": 0.6774423030405067, "irpefPct": 3.4843975539333627}, {"label": "da 90.000 a 100.000", "order": 28, "total": false, "n": 206764, "inc": 19587273, "med": 94730, "cont": 205212, "imp": 5616593, "impmed": 27370, "incPct": 0.48267612353673833, "irpefPct": 2.845697514808103}, {"label": "da 100.000 a 120.000", "order": 29, "total": false, "n": 258429, "inc": 28162519, "med": 108980, "cont": 256499, "imp": 8275128, "impmed": 32260, "incPct": 0.6032844592360166, "irpefPct": 4.192668437098747}, {"label": "da 120.000 a 150.000", "order": 30, "total": false, "n": 198247, "inc": 26407393, "med": 133200, "cont": 196838, "imp": 8031719, "impmed": 40800, "incPct": 0.46279378161956514, "irpefPct": 4.069343057358335}, {"label": "da 150.000 a 200.000", "order": 31, "total": false, "n": 144716, "inc": 24764715, "med": 171130, "cont": 143795, "imp": 7934669, "impmed": 55180, "incPct": 0.33782939918816923, "irpefPct": 4.020171879255738}, {"label": "da 200.000 a 300.000", "order": 32, "total": false, "n": 90098, "inc": 21490502, "med": 238520, "cont": 89558, "imp": 7281815, "impmed": 81310, "incPct": 0.21032749114165447, "irpefPct": 3.689397146870736}, {"label": "oltre 300.000", "order": 33, "total": false, "n": 58939, "inc": 34313406, "med": 582190, "cont": 58700, "imp": 13070629, "impmed": 222670, "incPct": 0.1375889808918952, "irpefPct": 6.622352103788463}]};
+
+const COLS = [
+  {k:'order',  t:'Classi di reddito complessivo in euro', align:'l'},
+  {k:'n',      t:'Numero dei contribuenti',               align:'l'},
+  {k:'inc',    t:'Reddito complessivo - Ammontare',       align:'l'},
+  {k:'med',    t:'Reddito medio',                         align:'l'},
+  {k:'cont',   t:'Contribuenti con Irpef a carico',       align:'r'},
+  {k:'imp',    t:'Imposta netta - Ammontare',             align:'l'},
+  {k:'impmed', t:'Imposta netta - Media',                 align:'l'},
+  {k:'incPct', t:'Incidenza percentuale contribuenti',    align:'l'},
+  {k:'irpefPct', t:'Irpef pagata in percentuale',         align:'l'}
+];
+
+const T = DATA.total;
+const MAXMED = Math.max(...DATA.rows.map(r => Math.abs(r.med)));
+const MAXIMP = Math.max(...DATA.rows.map(r => Math.abs(r.impmed)));
+
+const fmtInt = v => {
+  const s = Math.abs(Math.round(v)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return (v < 0 ? '-' : '') + s;
+};
+const fmtPct = v => {
+  let s = v.toFixed(2).replace(/\.?0+$/, '').replace('.', ',');
+  return s + '%';
+};
+const pctW = (v, tot) => Math.max(0, Math.min(100, Math.abs(v) / Math.abs(tot) * 100));
+
+let sort = {k:'irpefPct', dir:'desc'};
+
+function barCell(cls, w, label, isTot, extra){
+  return `<div class="bar ${cls}${extra||''}"><i style="width:${w}%"></i><b>${label}</b></div>`;
+}
+function tickCell(v, max, neg){
+  return `<div class="tick${v<0?' neg':''}"><span>${fmtInt(v)}</span><i style="width:${Math.abs(v)/max*100}%"></i></div>`;
+}
+
+function rowHTML(r, isTot){
+  const neg = v => v < 0 ? ' neg' : '';
+  const cells = [];
+  cells.push(`<td class="lab">${r.label}</td>`);
+  cells.push(`<td>${barCell('blue', isTot?100:pctW(r.n,T.n), fmtInt(r.n))}</td>`);
+  cells.push(`<td>${barCell('green'+neg(r.inc), isTot?100:pctW(r.inc,T.inc), fmtInt(r.inc))}</td>`);
+  cells.push(`<td class="${isTot?'red':''}">${tickCell(r.med, MAXMED)}</td>`);
+  cells.push(`<td class="r">${fmtInt(r.cont)}</td>`);
+  cells.push(`<td>${barCell('green', isTot?100:pctW(r.imp,T.imp), fmtInt(r.imp))}</td>`);
+  cells.push(`<td class="${isTot?'red':''}">${tickCell(r.impmed, MAXIMP)}</td>`);
+  cells.push(`<td>${barCell('orange pct', isTot?100:pctW(r.incPct,100), fmtPct(r.incPct))}</td>`);
+  cells.push(`<td>${barCell('green pct', isTot?100:pctW(r.irpefPct,100), fmtPct(r.irpefPct))}</td>`);
+  return `<tr class="${isTot?'tot':'dat'}">${cells.join('')}</tr>`;
+}
+
+function renderHead(){
+  const tr = document.getElementById('hdr');
+  tr.innerHTML = COLS.map(c => {
+    const active = sort.k === c.k;
+    const aria = active ? ` aria-sort="${sort.dir==='asc'?'ascending':'descending'}"` : '';
+    const arrow = active ? (sort.dir==='asc' ? '▲' : '▼') : '▼';
+    return `<th class="${c.align==='r'?'r':''}"${aria}><button class="sortbtn" type="button" data-k="${c.k}"><span>${c.t}</span><span class="arr" aria-hidden="true">${arrow}</span></button></th>`;
+  }).join('');
+}
+
+function renderBody(){
+  const rows = DATA.rows.slice().sort((a,b) => {
+    const d = a[sort.k] - b[sort.k];
+    if (d !== 0) return sort.dir === 'asc' ? d : -d;
+    return a.order - b.order;
+  });
+  document.getElementById('body').innerHTML = rowHTML(T, true) + rows.map(r => rowHTML(r, false)).join('');
+}
+
+function render(){ renderHead(); renderBody(); }
+
+document.getElementById('hdr').addEventListener('click', e => {
+  const b = e.target.closest('.sortbtn'); if (!b) return;
+  const k = b.dataset.k;
+  if (sort.k === k) sort.dir = sort.dir === 'asc' ? 'desc' : 'asc';
+  else sort = {k, dir: k === 'order' ? 'asc' : 'desc'};
+  render();
+  const nb = document.querySelector(`.sortbtn[data-k="${k}"]`); if (nb) nb.focus();
+});
+
+document.getElementById('dl').addEventListener('click', () => {
+  const head = ['Classi di reddito complessivo in euro','Numero dei contribuenti','Reddito complessivo - Ammontare (migliaia di euro)','Reddito medio (euro)','Contribuenti con Irpef a carico','Imposta netta - Ammontare (migliaia di euro)','Imposta netta - Media (euro)','Incidenza percentuale contribuenti','Irpef pagata in percentuale'];
+  const line = r => [r.label, r.n, r.inc, r.med, r.cont, r.imp, r.impmed, r.incPct.toFixed(2).replace('.',','), r.irpefPct.toFixed(2).replace('.',',')].map(x => `"${String(x).replace(/"/g,'""')}"`).join(';');
+  const csv = '\ufeff' + [head.map(h => `"${h}"`).join(';'), line(T), ...DATA.rows.map(line)].join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+  a.download = 'chi_paga_irpef_2025.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+});
+
+render();
+</script>
+</body>
+</html>
