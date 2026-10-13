@@ -49,13 +49,12 @@ h1{max-width:560px;font-family:var(--serif);font-weight:700;font-size:clamp(24px
 .switch button[aria-checked="true"]{background:var(--ink)}
 .switch button[aria-checked="true"] i{transform:translateX(20px);background:var(--bg)}
 .switch button:focus-visible{outline:2px solid var(--cpb);outline-offset:2px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
 .panel{background:var(--card);border:1px solid var(--grid);border-radius:12px;padding:18px 16px 12px}
 .panel h2{font-family:var(--serif);font-size:22px;margin:0;font-weight:600}
 .panel h2 small{font:400 12px var(--mono);color:var(--muted);margin-left:6px;letter-spacing:.02em}
 .meta{font:400 12px var(--mono);color:var(--ink2);margin:6px 0 4px;display:flex;flex-wrap:wrap;gap:2px 14px}
-svg{width:100%;height:auto;display:block;overflow:visible}
+svg{width:100%;max-width:420px;height:auto;display:block;overflow:visible;margin:0 auto}
 svg text{font-family:var(--sans)}
 .mono{font-family:var(--mono)!important}
 .save{margin:2px 0 0;padding:10px 12px;border-top:1px solid var(--grid);display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -163,6 +162,21 @@ function view(tb){root.classList.toggle("show-table",tb);sw.setAttribute("aria-c
 sw.onclick=()=>view(sw.getAttribute("aria-checked")!=="true");
 lg.onclick=()=>view(false);lt.onclick=()=>view(true);
 lg.style.cursor=lt.style.cursor="pointer";
+
+// --- altezza reattiva per l'iframe: comunica l'altezza alla pagina che ospita il grafico ---
+(function(){
+  let last=0;
+  function send(){
+    const hgt=Math.ceil(document.getElementById("root").getBoundingClientRect().height);
+    if(hgt===last)return; last=hgt;
+    parent.postMessage({type:"fq-concordato-height",height:hgt},"*");
+  }
+  if(window.parent===window)return;
+  if("ResizeObserver" in window) new ResizeObserver(send).observe(document.getElementById("root"));
+  addEventListener("load",send); addEventListener("resize",send);
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(send);
+  send();
+})();
 </script>
 </body>
 </html>
