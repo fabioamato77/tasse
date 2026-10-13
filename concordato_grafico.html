@@ -169,7 +169,7 @@ lg.style.cursor=lt.style.cursor="pointer";
   function send(){
     const hgt=Math.ceil(document.getElementById("root").getBoundingClientRect().height);
     if(hgt===last)return; last=hgt;
-    parent.postMessage({type:"fq-concordato-height",height:hgt},"*");
+    parent.postMessage({type:"fq-embed-height",height:hgt},"*");
   }
   if(window.parent===window)return;
   if("ResizeObserver" in window) new ResizeObserver(send).observe(document.getElementById("root"));
