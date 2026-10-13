@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="it">
 <head>
+<!-- versione 2026-10-13-v5 -->
+<meta name="fq-version" content="2026-10-13-v5">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Concordato preventivo, quanto risparmia chi aderisce</title>
@@ -49,17 +51,18 @@ h1{max-width:560px;font-family:var(--serif);font-weight:700;font-size:clamp(24px
 .switch button[aria-checked="true"]{background:var(--ink)}
 .switch button[aria-checked="true"] i{transform:translateX(20px);background:var(--bg)}
 .switch button:focus-visible{outline:2px solid var(--cpb);outline-offset:2px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
-.panel{background:var(--card);border:1px solid var(--grid);border-radius:12px;padding:18px 16px 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.panel{background:var(--card);border:1px solid var(--grid);border-radius:12px;padding:16px 14px 10px;min-width:0}
 .panel h2{font-family:var(--serif);font-size:22px;margin:0;font-weight:600}
 .panel h2 small{font:400 12px var(--mono);color:var(--muted);margin-left:6px;letter-spacing:.02em}
-.meta{font:400 12px var(--mono);color:var(--ink2);margin:6px 0 4px;display:flex;flex-wrap:wrap;gap:2px 14px}
-svg{width:100%;max-width:420px;height:auto;display:block;overflow:visible;margin:0 auto}
+.meta span{white-space:nowrap}
+.meta{font:400 11px var(--mono);color:var(--ink2);margin:6px 0 4px;display:flex;flex-wrap:wrap;gap:2px 14px}
+svg{max-width:100%;height:auto;display:block;overflow:visible;margin:0 auto}
 svg text{font-family:var(--sans)}
 .mono{font-family:var(--mono)!important}
-.save{margin:2px 0 0;padding:10px 12px;border-top:1px solid var(--grid);display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.save div{font-size:12px;color:var(--ink2)}
-.save b{display:block;font:500 18px var(--mono);color:var(--ink)}
+.save{margin:2px 0 0;padding:10px 6px;border-top:1px solid var(--grid);display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.save div{font-size:11.5px;color:var(--ink2);white-space:nowrap}
+.save b{display:block;font:500 16px var(--mono);color:var(--ink)}
 .note{color:var(--muted);font-size:12.5px;margin-top:16px;max-width:820px}
 .source{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--grid);font-size:12.5px;color:var(--ink2)}
 .source b{font-weight:600;color:var(--ink)}
@@ -108,42 +111,50 @@ const D=[
  {n:"Medico",isa:"ISA 9",dich:102800,a:[0.10,0.45],y:[{prop:110510,magg:7710,cpb:771,ord:3470,ris:2699,sg:104500},{prop:121175,magg:18375,cpb:1838,ord:8269,ris:6431,sg:106900}]}
 ];
 const YL=["1° anno · 2026","2° anno · 2027"];
-const f=n=>n.toLocaleString("it-IT")+" €";
+const num=n=>String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,".");
+const f=n=>num(n)+" €";
 const p=n=>Math.round(n*100)+"%";
 const grid=document.getElementById("grid"),tip=document.getElementById("tip");
-const W=340,H=250,L=8,R=8,T=26,B=40,iw=W-L-R,ih=H-T-B;
+const H=240,T=26,B=46,L=6,R=6;
 function nice(m){const e=Math.pow(10,Math.floor(Math.log10(m)));const f=m/e;return (f<=1?1:f<=2?2:f<=5?5:10)*e}
-D.forEach(d=>{
-  const max=nice(Math.max(...d.y.map(y=>y.ord))*1.02), step=max/4;
-  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${d.n}: imposta con CPB e ordinaria nei due anni">`;
+function render(d,box,avail){
+  const W=Math.max(190,Math.min(420,Math.floor(avail))),iw=W-L-R,ih=H-T-B;
+  const max=nice(Math.max(...d.y.map(y=>y.ord))*1.02),step=max/4,gw=iw/2,bw=Math.min(36,Math.floor(gw*0.36)),gap=4,fs=W<300?10.5:11.5,two=gw<110;
+  let s=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${d.n}: imposta con CPB e ordinaria nei due anni">`;
   for(let i=0;i<=4;i++){const yy=T+ih-ih*i/4;
     s+=`<line x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}" stroke="${i?'var(--grid)':'var(--line)'}" stroke-width="1"/>`;
-    if(i&&i<4) s+=`<text x="${L}" y="${yy-4}" font-size="10" fill="var(--muted)" class="mono">${(step*i).toLocaleString('it-IT')}</text>`;}
-  const gw=iw/2, bw=36, gap=4;
+    if(i&&i<4) s+=`<text x="${L}" y="${yy-4}" font-size="10" fill="var(--muted)" class="mono">${num(step*i)}</text>`;}
   d.y.forEach((y,gi)=>{
     const cx=L+gw*gi+gw/2;
-    [["cpb","var(--cpb)","Con CPB",y.cpb],["ord","var(--ord)","Ordinaria",y.ord]].forEach(([k,c,lab,v],bi)=>{
-      const h=Math.max(2,ih*v/max), x=cx-bw-gap/2+bi*(bw+gap), yy=T+ih-h, r=4;
-      s+=`<path class="m" data-g="${gi}" data-k="${k}" d="M${x},${T+ih}V${yy+r}Q${x},${yy} ${x+r},${yy}H${x+bw-r}Q${x+bw},${yy} ${x+bw},${yy+r}V${T+ih}Z" fill="${c}"/>`;
-      s+=`<text x="${x+bw/2}" y="${yy-6}" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--ink)" class="mono">${v.toLocaleString('it-IT')}</text>`;
+    [["cpb","var(--cpb)",y.cpb],["ord","var(--ord)",y.ord]].forEach(([k,c,v],bi)=>{
+      const hh=Math.max(2,ih*v/max),x=cx-bw-gap/2+bi*(bw+gap),yy=T+ih-hh,r=4;
+      s+=`<path d="M${x},${T+ih}V${yy+r}Q${x},${yy} ${x+r},${yy}H${x+bw-r}Q${x+bw},${yy} ${x+bw},${yy+r}V${T+ih}Z" fill="${c}"/>`;
+      s+=`<text x="${x+bw/2}" y="${yy-6}" text-anchor="middle" font-size="${fs}" font-weight="500" fill="var(--ink)" class="mono">${num(v)}</text>`;
     });
-    s+=`<text x="${cx}" y="${T+ih+17}" text-anchor="middle" font-size="12" fill="var(--ink2)">${YL[gi]}</text>`;
+    if(two){
+      s+=`<text text-anchor="middle" font-size="11.5" fill="var(--ink2)"><tspan x="${cx}" y="${T+ih+16}">${gi+1}° anno</tspan><tspan x="${cx}" y="${T+ih+31}" class="mono">${gi?2027:2026}</tspan></text>`;
+    } else s+=`<text x="${cx}" y="${T+ih+17}" text-anchor="middle" font-size="12" fill="var(--ink2)">${YL[gi]}</text>`;
     s+=`<rect class="hit" data-g="${gi}" x="${cx-bw-8}" y="${T}" width="${2*bw+gap+16}" height="${ih}" fill="transparent"/>`;
   });
-  s+=`</svg>`;
-  const el=document.createElement("div");el.className="panel";
-  el.innerHTML=`<h2>${d.n}<small>${d.isa}</small></h2>
-   <div class="meta"><span>Dichiarato 2025: ${f(d.dich)}</span><span>Aliquote ${p(d.a[0])} / ${p(d.a[1])}</span></div>${s}
-   <div class="save">${d.y.map((y,i)=>`<div>Risparmio ${i?"2027":"2026"}<b>${f(y.ris)}</b></div>`).join("")}</div>`;
-  grid.appendChild(el);
-  el.querySelectorAll(".hit").forEach(h=>{
-    const y=d.y[+h.dataset.g];
-    h.addEventListener("mousemove",e=>{
-      tip.innerHTML=`<b>${d.n} · ${YL[+h.dataset.g]}</b><br>Reddito proposto: <b>${f(y.prop)}</b><br>Maggior reddito: <b>${f(y.magg)}</b><br>Con CPB: <b>${f(y.cpb)}</b> (${p(d.a[0])})<br>Ordinaria: <b>${f(y.ord)}</b> (${p(d.a[1])})<br>Risparmio: <b>${f(y.ris)}</b><br>Conviene se si supera ≈ <b>${f(y.sg)}</b>`;
+  box.innerHTML=s+`</svg>`;
+  box.querySelectorAll(".hit").forEach(hit=>{
+    const y=d.y[+hit.dataset.g];
+    hit.addEventListener("mousemove",e=>{
+      tip.innerHTML=`<b>${d.n} · ${YL[+hit.dataset.g]}</b><br>Reddito proposto: <b>${f(y.prop)}</b><br>Maggior reddito: <b>${f(y.magg)}</b><br>Con CPB: <b>${f(y.cpb)}</b> (${p(d.a[0])})<br>Ordinaria: <b>${f(y.ord)}</b> (${p(d.a[1])})<br>Risparmio: <b>${f(y.ris)}</b><br>Conviene se si supera ≈ <b>${f(y.sg)}</b>`;
       tip.style.opacity=1;const w=tip.offsetWidth;let x=e.clientX+14;if(x+w>innerWidth-8)x=e.clientX-w-14;
       tip.style.left=x+"px";tip.style.top=(e.clientY+14)+"px";});
-    h.addEventListener("mouseleave",()=>tip.style.opacity=0);
+    hit.addEventListener("mouseleave",()=>tip.style.opacity=0);
   });
+}
+D.forEach(d=>{
+  const el=document.createElement("div");el.className="panel";
+  el.innerHTML=`<h2>${d.n}<small>${d.isa}</small></h2>
+   <div class="meta"><span>Dichiarato 2025: ${f(d.dich)}</span><span>Aliquote ${p(d.a[0])} / ${p(d.a[1])}</span></div><div class="chart"></div>
+   <div class="save">${d.y.map((y,i)=>`<div>Risparmio ${i?"2027":"2026"}<b>${f(y.ris)}</b></div>`).join("")}</div>`;
+  grid.appendChild(el);
+  const box=el.querySelector(".chart");let lw=0;
+  const draw=()=>{const w=box.clientWidth;if(w&&w!==lw){lw=w;render(d,box,w);}};
+  draw(); if("ResizeObserver" in window) new ResizeObserver(draw).observe(box); else addEventListener("resize",draw);
 });
 // table view
 const rows=[["sec","Reddito"],["Reddito dichiarato 2025",y=>"",d=>f(d.dich),1],["Reddito proposto",y=>f(y.prop)],["Maggior reddito",y=>f(y.magg)],
